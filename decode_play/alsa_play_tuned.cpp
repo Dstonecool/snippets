@@ -6,7 +6,7 @@
  *  - sample rate is 44100
  *
  * Usage:
- *   ./alsa_play < cool_song_samples
+ *   ./alsa_play_tuned < cool_song_samples
  */
 #include <unistd.h>
 #include <stdlib.h>
@@ -115,7 +115,8 @@ void set_sw_params(snd_pcm_t* pcm,
         oops("snd_pcm_sw_params_set_start_threshold");
     }
 
-    // no idea; same as in snd_pcm_set_params()
+    // set minimum number of samples that can be read by ALSA, so that it'll
+    // wait until there are at least 'period_size' samples in circular buffer
     if (snd_pcm_sw_params_set_avail_min(pcm, sw_params, period_size) < 0) {
         oops("snd_pcm_sw_params_set_avail_min");
     }
