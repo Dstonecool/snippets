@@ -1,4 +1,10 @@
-all: ffmpeg_decode ffmpeg_play ffmpeg_play_encoder
+snippets := \
+	ffmpeg_decode \
+	ffmpeg_play \
+	ffmpeg_play_encoder \
+	sndfile_decode
+
+all: $(snippets)
 
 ffmpeg_decode: ffmpeg_decode.cpp Makefile
 	g++ -ggdb -o $@ $@.cpp -lavformat -lavcodec -lavutil -lswresample
@@ -8,3 +14,6 @@ ffmpeg_play: ffmpeg_play.cpp Makefile
 
 ffmpeg_play_encoder: ffmpeg_play_encoder.cpp Makefile
 	g++ -ggdb -o $@ $@.cpp -lavformat -lavcodec -lavdevice -lavutil
+
+sndfile_decode: sndfile_decode.cpp Makefile
+	g++ -ggdb -o $@ $@.cpp -lsndfile
