@@ -2,7 +2,8 @@ snippets := \
 	ffmpeg_decode \
 	ffmpeg_play \
 	ffmpeg_play_encoder \
-	sndfile_decode
+	sndfile_decode \
+	alsa_play
 
 all: $(snippets)
 
@@ -17,3 +18,6 @@ ffmpeg_play_encoder: ffmpeg_play_encoder.cpp Makefile
 
 sndfile_decode: sndfile_decode.cpp Makefile
 	g++ -ggdb -o $@ $@.cpp -lsndfile
+
+alsa_play: alsa_play.cpp Makefile
+	g++ -ggdb -o $@ $@.cpp -lasound
