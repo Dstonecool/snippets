@@ -4,6 +4,7 @@ snippets := \
 	ffmpeg_play_encoder \
 	sox_decode_simple \
 	sox_decode_chain \
+	sox_play \
 	sndfile_decode \
 	alsa_play_simple \
 	alsa_play_tuned
@@ -23,6 +24,9 @@ sox_decode_simple: sox_decode_simple.cpp Makefile
 	g++ -ggdb -o $@ $@.cpp -lsox
 
 sox_decode_chain: sox_decode_chain.cpp Makefile
+	g++ -ggdb -o $@ $@.cpp -lsox
+
+sox_play: sox_play.cpp Makefile
 	g++ -ggdb -o $@ $@.cpp -lsox
 
 sndfile_decode: sndfile_decode.cpp Makefile
