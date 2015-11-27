@@ -32,32 +32,41 @@ int main(int argc, char** argv) {
         av_samples_get_buffer_size(
             NULL, in_channels, in_samples, AV_SAMPLE_FMT_FLT, 1);
 
+    // register supported formats and codecs
     av_register_all();
+
+    // register supported devices
     avdevice_register_all();
 
+    // find output format for ALSA device
     AVOutputFormat* fmt = av_guess_format("alsa", NULL, NULL);
     if (!fmt) {
         fprintf(stderr, "av_guess_format()\n");
         exit(1);
     }
 
+    // allocate empty format context
+    // provides methods for writing output packets
     AVFormatContext* fmt_ctx = avformat_alloc_context();
     if (!fmt_ctx) {
         fprintf(stderr, "avformat_alloc_context()\n");
         exit(1);
     }
 
+    // tell format context to use ALSA as ouput device
     fmt_ctx->oformat = fmt;
 
+    // add stream to format context
     AVStream* stream = avformat_new_stream(fmt_ctx, NULL);
     if (!stream) {
         fprintf(stderr, "avformat_new_stream()\n");
         exit(1);
     }
 
+    // initialize stream codec context
+    // format conetxt uses codec context when writing packets
     AVCodecContext* codec_ctx = stream->codec;
     assert(codec_ctx);
-
     codec_ctx->codec_id = CODEC_ID_PCM_F32LE;
     codec_ctx->codec_type = AVMEDIA_TYPE_AUDIO;
     codec_ctx->sample_fmt = AV_SAMPLE_FMT_FLT;
@@ -66,9 +75,11 @@ int main(int argc, char** argv) {
     codec_ctx->channels = in_channels;
     codec_ctx->channel_layout = AV_CH_FRONT_LEFT | AV_CH_FRONT_RIGHT;
 
+    // allocate buffer for input samples
     uint8_t* buffer = (uint8_t*)av_malloc(max_buffer_size);
     assert(buffer);
 
+    // initialze output device
     if (avformat_write_header(fmt_ctx, NULL) < 0) {
         fprintf(stderr, "avformat_write_header()\n");
         exit(1);
@@ -77,6 +88,7 @@ int main(int argc, char** argv) {
     for (;;) {
         memset(buffer, 0, max_buffer_size);
 
+        // read input buffer from stdin
         ssize_t ret = read(STDIN_FILENO, buffer, max_buffer_size);
         if (ret < 0) {
             fprintf(stderr, "read(stdin)\n");
@@ -87,11 +99,13 @@ int main(int argc, char** argv) {
             break;
         }
 
+        // create output packet
         AVPacket packet;
         av_init_packet(&packet);
         packet.data = buffer;
         packet.size = max_buffer_size;
 
+        // write output packet to format context
         if (av_write_frame(fmt_ctx, &packet) < 0) {
             fprintf(stderr, "av_write_frame()\n");
             exit(1);
