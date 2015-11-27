@@ -11,6 +11,9 @@ snippets := \
 
 all: $(snippets)
 
+clean:
+	rm -f $(snippets)
+
 ffmpeg_decode: ffmpeg_decode.cpp Makefile
 	g++ -ggdb -o $@ $@.cpp -lavformat -lavcodec -lavutil -lswresample
 
