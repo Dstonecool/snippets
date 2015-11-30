@@ -70,6 +70,7 @@ int main(int argc, char** argv) {
     sox_signalinfo_t out_si = {};
     out_si.rate = sample_rate;
     out_si.channels = out_channels;
+    out_si.precision = SOX_SAMPLE_PRECISION;
 
     sox_effect_handler_t out_handler = {
         "stdout", NULL, SOX_EFF_MCHAN, NULL, NULL, stdout_writer, NULL, NULL, NULL, 0
@@ -93,7 +94,7 @@ int main(int argc, char** argv) {
         }
 
         if (sox_add_effect(
-                chain, effect, &input->signal, &input->signal) != SOX_SUCCESS) {
+                chain, effect, &input->signal, &out_si) != SOX_SUCCESS) {
             oops("sox_add_effect(input)");
         }
 
@@ -104,6 +105,10 @@ int main(int argc, char** argv) {
         sox_effect_t* effect = sox_create_effect(sox_find_effect("rate"));
         if (!effect) {
             oops("sox_create_effect(rate)");
+        }
+
+        if (sox_effect_options(effect, 0, NULL) != SOX_SUCCESS) {
+            oops("sox_effect_options");
         }
 
         if (sox_add_effect(
@@ -118,6 +123,10 @@ int main(int argc, char** argv) {
         sox_effect_t* effect = sox_create_effect(sox_find_effect("channels"));
         if (!effect) {
             oops("sox_create_effect(channels)");
+        }
+
+        if (sox_effect_options(effect, 0, NULL) != SOX_SUCCESS) {
+            oops("sox_effect_options");
         }
 
         if (sox_add_effect(
