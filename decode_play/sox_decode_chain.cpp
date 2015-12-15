@@ -102,21 +102,45 @@ int main(int argc, char** argv) {
     }
 
     if (input->signal.rate != out_si.rate) {
-        sox_effect_t* effect = sox_create_effect(sox_find_effect("rate"));
-        if (!effect) {
-            oops("sox_create_effect(rate)");
+        {
+            sox_effect_t* effect = sox_create_effect(sox_find_effect("gain"));
+            if (!effect) {
+                oops("sox_create_effect(gain)");
+            }
+
+            const char* args[] = { "-h" };
+
+            if (sox_effect_options(effect, 1, (char**)args) != SOX_SUCCESS) {
+                oops("sox_effect_options(gain)");
+            }
+
+            if (sox_add_effect(
+                    chain, effect, &input->signal, &out_si) != SOX_SUCCESS) {
+                oops("sox_add_effect(gain)");
+            }
+
+            free(effect);
         }
 
-        if (sox_effect_options(effect, 0, NULL) != SOX_SUCCESS) {
-            oops("sox_effect_options");
-        }
+        {
+            sox_effect_t* effect = sox_create_effect(sox_find_effect("rate"));
+            if (!effect) {
+                oops("sox_create_effect(rate)");
+            }
 
-        if (sox_add_effect(
-                chain, effect, &input->signal, &out_si) != SOX_SUCCESS) {
-            oops("sox_add_effect(rate)");
-        }
+            const char* args[] = { "-Q", "7", "-b", "99.7" };
 
-        free(effect);
+            if (sox_effect_options(effect, 4, (char**)args) != SOX_SUCCESS) {
+                oops("sox_effect_options(rate)");
+            }
+
+            if (sox_add_effect(
+                    chain, effect, &input->signal, &out_si) != SOX_SUCCESS) {
+                oops("sox_add_effect(rate)");
+            }
+
+            free(effect);
+        }
     }
 
     if (input->signal.channels != out_si.channels) {
@@ -126,7 +150,7 @@ int main(int argc, char** argv) {
         }
 
         if (sox_effect_options(effect, 0, NULL) != SOX_SUCCESS) {
-            oops("sox_effect_options");
+            oops("sox_effect_options(channels)");
         }
 
         if (sox_add_effect(
