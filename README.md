@@ -1,1 +1,1 @@
-Random code snippets. All code in in public domain.
+Random code snippets. All code is in public domain.
